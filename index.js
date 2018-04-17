@@ -6,7 +6,7 @@ module.exports = {
   producer: Producer
 };
 
-new Producer()
+new Consumer()
   .connect()
   .then(() => {
     console.log('Done')

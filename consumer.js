@@ -17,6 +17,7 @@ class Consumer extends Base {
     this._numMessages = 5;
     this._kafkaConsumer = new Kafka.KafkaConsumer({
       debug: 'all',
+      'group.id': 'kafka',
       'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
       'enable.auto.commit': false
     }, topicConfig);

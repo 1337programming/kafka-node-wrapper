@@ -33,7 +33,10 @@ class Base {
   connect(kafkaClient) {
     this._check();
     return new Promise((resolve, reject) => {
-      kafkaClient.connect()
+      kafkaClient
+        .connect(null, (data) => {
+          console.log('CONNECT', data);
+        })
         .on('event.error', (error) => {
           console.error('Connect Operation (Error)', `${new Date()}:  Error: ${error}`);
           this._errorDispatcher.next(error);
