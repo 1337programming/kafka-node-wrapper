@@ -1,0 +1,17 @@
+version: '2'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "${ZookeeperPort}:${ZookeeperPort}"
+  kafka:
+    image: wurstmeister/kafka
+    command: [start-kafka.sh]
+    ports:
+      - "${KafkaPort}:${KafkaPort}"
+    environment:
+      KAFKA_CREATE_TOPICS: "${Topic1Name}:${Topic1Partition}:${Topic1Replicas}" # topic:partition:replicas
+      KAFKA_ADVERTISED_HOST_NAME: ${KafkaIP} # docker-machine ip
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZookeeperPort}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
