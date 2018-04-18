@@ -4,7 +4,7 @@ const Subject = require('rxjs').Subject; // Reactive Extension (helps us structu
 const Base = require('./base');
 
 /**
- * Kafka Consumer for Centene
+ * Kafka Consumer
  * @param {TopicConfig} topicConfig - the Kafka Topic Configuration
  */
 class Consumer extends Base {
@@ -16,10 +16,10 @@ class Consumer extends Base {
     this._counter = 0;
     this._numMessages = 5;
     this._kafkaConsumer = new Kafka.KafkaConsumer({
-      debug: 'all',
+      // debug: 'all',
       'group.id': 'kafka',
       'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
-      'enable.auto.commit': false
+      'enable.auto.commit': true
     }, topicConfig);
     this._initEvent();
   }
@@ -33,7 +33,13 @@ class Consumer extends Base {
       .then(() => {
         this._kafkaConsumer.subscribe([ENV.Topic1Name]);
         // start consuming messages
-        this._kafkaConsumer.consume(); // @TODO add event here
+        this._kafkaConsumer.consume((err, message) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(message);
+          }
+        });
       });
   }
 
@@ -62,8 +68,13 @@ class Consumer extends Base {
 
     super.initEvent(this._kafkaConsumer);
 
+    this._kafkaConsumer.on('event', (event) => {
+      console.log('EVENT11', event);
+    });
+
     // Listen to all messages
     this._kafkaConsumer.on('data', (m) => {
+      console.log('DATA BERRAHH!!');
       this._counter++;
 
       // Reset Counter
@@ -78,6 +89,7 @@ class Consumer extends Base {
       }
 
       // Output the actual message contents
+      // @TODO remove this after test
       console.log(JSON.stringify(m));
       console.log(m.value.toString());
 

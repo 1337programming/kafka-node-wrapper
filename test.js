@@ -1,12 +1,12 @@
 const assert = require('assert');
 const expect = require("chai").expect;
 
-const KafkaCentene = require('./index');
+const Kafka = require('./index');
 
-describe('Kafka Centene Test', () => {
+describe('Kafka  Test', () => {
 
-  const producer = new KafkaCentene.producer();
-  const consumer = new KafkaCentene.consumer();
+  const producer = new Kafka.producer();
+  const consumer = new Kafka.consumer();
 
   describe('Consumer', () => {
     it('Connect', (done) => {

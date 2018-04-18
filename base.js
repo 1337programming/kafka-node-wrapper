@@ -42,8 +42,8 @@ class Base {
           this._errorDispatcher.next(error);
           return reject(error);
         })
-        .on('ready', () => {
-          console.log('Connect Operation', `${new Date()}: Consumer Ready. Args: ${JSON.stringify(arg)}`);
+        .on('ready', (args) => {
+          console.log('Connect Operation', `${new Date()}: Consumer Ready. Args: ${JSON.stringify(args)}`);
           return resolve();
         });
     });

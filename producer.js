@@ -4,7 +4,7 @@ const Subject = require('rxjs').Subject; // Reactive Extension (helps us structu
 const Base = require('./base');
 
 /**
- * Kafka Consumer for Centene
+ * Kafka Consumer for
  * @param {TopicConfig} topicConfig - the Kafka Topic Configuration
  */
 class Producer extends Base {

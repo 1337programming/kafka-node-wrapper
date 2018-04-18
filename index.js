@@ -5,12 +5,3 @@ module.exports = {
   consumer: Consumer,
   producer: Producer
 };
-
-new Consumer()
-  .connect()
-  .then(() => {
-    console.log('Done')
-  })
-  .catch((err) => {
-    console.error(err);
-  });
