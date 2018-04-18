@@ -15,7 +15,7 @@ class Producer extends Base {
     this._deliveryReportDispatcher = new Subject();
 
     this._kafkaProducer = new Kafka.Producer({
-      debug: 'all',
+      // debug: 'all',
       'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
       'dr_cb': true  // delivery report callback
     }, topicConfig);

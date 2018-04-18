@@ -68,19 +68,16 @@ class Consumer extends Base {
 
     super.initEvent(this._kafkaConsumer);
 
-    this._kafkaConsumer.on('event', (event) => {
-      console.log('EVENT11', event);
-    });
-
     // Listen to all messages
     this._kafkaConsumer.on('data', (m) => {
-      console.log('DATA BERRAHH!!');
       this._counter++;
 
       // Reset Counter
       if (this._counter === 100000) {
         this._counter = 0;
       }
+
+      this._kafkaConsumer.commit(m);
 
       // committing offsets every _numMessages
       if (this._counter % this._numMessages === 0) {
