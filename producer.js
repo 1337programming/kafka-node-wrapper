@@ -91,7 +91,6 @@ class Producer extends Base {
       }
       console.log('Delivery Report Operation:', new Date(), report);
       this._deliveryReportDispatcher.next(report);
-      this.counter++;
     });
 
   }
