@@ -1,5 +1,4 @@
 const Kafka = require('./index');
-// const Kafka = require('kafka-centene');
 
 const consumer = new Kafka.consumer();
 const producer = new Kafka.producer();
