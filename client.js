@@ -1,9 +1,9 @@
 const Subject = require('rxjs').Subject;
 
 /**
- * Kafka Base
+ * Kafka Client base class
  */
-class Base {
+class Client {
 
   constructor() {
     this._logDispatcher = new Subject();
@@ -109,4 +109,4 @@ class Base {
 
 }
 
-module.exports = Base;
+module.exports = Client;

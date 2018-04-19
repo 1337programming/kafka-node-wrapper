@@ -1,13 +1,13 @@
 const Kafka = require('node-rdkafka'); // Kafka Node SDK
 const ENV = require('dotenv').config().parsed; // Environment
 const Subject = require('rxjs').Subject; // Reactive Extension (helps us structure events)
-const Base = require('./base');
+const Client = require('./client');
 
 /**
  * Kafka Consumer for
  * @param {TopicConfig} topicConfig - the Kafka Topic Configuration
  */
-class Producer extends Base {
+class Producer extends Client {
 
   constructor(topicConfig = null) {
     super();
