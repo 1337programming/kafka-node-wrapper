@@ -1,4 +1,5 @@
 ### Running
+TEST
 
 * run `npm install`
 * run `docker-compose up`
