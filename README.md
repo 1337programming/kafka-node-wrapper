@@ -12,64 +12,43 @@ You can now see the producer tab making new messages and the consumer tab readin
 
 If you are getting an error about the topic not existing, try running `docker-compose rm` to delete the containers. Then re-run `docker-compose up` again.
 
-## API
-<a name="Client"></a>
+## Use
 
-## Client
-Kafka Client base class
+Install
+`$ npm install`
 
-**Kind**: global class
+```javascript
+const Kafka = require('kafka-node-wrapper'); // Node < 9.x
+// import * as Kafka from 'kafka-node-wrapper' // Node > 9.x
 
-* [Client](#Client)
-    * [.log()](#Client+log) ⇒ <code>Observable.&lt;log&gt;</code>
-    * [.error()](#Client+error) ⇒ <code>Observable.&lt;Error&gt;</code>
-    * [.connect()](#Client+connect)
-    * [.disconnect()](#Client+disconnect)
-    * [.initEvent()](#Client+initEvent)
-    * [.emitError(err)](#Client+emitError)
+const consumer = new Kafka.consumer();
+const producer = new Kafka.producer();
 
-<a name="Client+log"></a>
+// Connect with producer and consumer in parallel
+function connect() {
+  return Promise.all[consumer.connect(), producer.connect()];
+}
 
-### client.log() ⇒ <code>Observable.&lt;log&gt;</code>
-Listen to log stream
+function events() {
+  // Consumer Events
+  consumer.message()
+    .subscribe((data) => {
+      console.log('Data', data);
+    });
+  consumer.error()
+    .subscribe((err) => {
+      console.log('Consumer Error', err);
+    });
 
-**Kind**: instance method of [<code>Client</code>](#Client)
-**Returns**: <code>Observable.&lt;log&gt;</code> - - log message
-<a name="Client+error"></a>
+  // Producer Events
+  producer.report()
+    .subscribe((report) => {
+      console.log('Producer Delivery Report', report);
+    });
+  producer.error()
+    .subscribe((err) => {
+      console.log('Producer Error', err);
+    });
+}
+```
 
-### client.error() ⇒ <code>Observable.&lt;Error&gt;</code>
-Listen to error stream
-
-**Kind**: instance method of [<code>Client</code>](#Client)
-<a name="Client+connect"></a>
-
-### client.connect()
-Connect to Kafka
-
-**Kind**: instance method of [<code>Client</code>](#Client)
-**Access**: protected
-<a name="Client+disconnect"></a>
-
-### client.disconnect()
-Disconnect from Kafka
-
-**Kind**: instance method of [<code>Client</code>](#Client)
-**Access**: protected
-<a name="Client+initEvent"></a>
-
-### client.initEvent()
-Initializes the events
-
-**Kind**: instance method of [<code>Client</code>](#Client)
-**Access**: protected
-<a name="Client+emitError"></a>
-
-### client.emitError(err)
-Emit error
-
-**Kind**: instance method of [<code>Client</code>](#Client)
-**Access**: protected
-
-| Param | Description |
-| --- | --- |
-| err | Error to emit |
