@@ -1,4 +1,4 @@
-const Kafka = require('./index');
+const Kafka = require('./src/index');
 
 const consumer = new Kafka.consumer();
 const producer = new Kafka.producer();

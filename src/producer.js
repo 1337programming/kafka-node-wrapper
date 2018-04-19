@@ -14,7 +14,7 @@ class Producer extends Client {
 
     this._deliveryReportDispatcher = new Subject();
 
-    this._kafkaProducer = new Kafka.Producer({
+    this.kafkaProducer = new Kafka.Producer({
       // debug: 'all',
       'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
       'dr_cb': true  // delivery report callback
@@ -28,7 +28,10 @@ class Producer extends Client {
    * @return {Promise<void>}
    */
   connect() {
-    return super.connect(this._kafkaProducer);
+    return super.connect(this.kafkaProducer)
+      .then(() => {
+
+      })
   }
 
   /**
@@ -36,7 +39,7 @@ class Producer extends Client {
    * @return {Promise<void>}
    */
   disconnect() {
-    return super.disconnect(this._kafkaProducer);
+    return super.disconnect(this.kafkaProducer);
   }
 
   /**
@@ -51,7 +54,7 @@ class Producer extends Client {
    */
   publish(message, partition = -1, key = null, opaque = null) {
     try {
-      this._kafkaProducer.produce(
+      this.kafkaProducer.produce(
         ENV.Topic1Name,
         partition,
         new Buffer.from(message),
@@ -59,7 +62,7 @@ class Producer extends Client {
         Date.now(),
         opaque
       );
-      this._kafkaProducer.poll();
+      this.kafkaProducer.poll();
       return Promise.resolve();
     } catch (err) {
       console.error('Producer Operation (Error)', new Date(), err);
@@ -83,9 +86,9 @@ class Producer extends Client {
    */
   _initEvent() {
 
-    super.initEvent(this._kafkaProducer);
+    super.initEvent(this.kafkaProducer);
 
-    this._kafkaProducer.on('delivery-report', (err, report) => {
+    this.kafkaProducer.on('delivery-report', (err, report) => {
       if (err) {
         this.emitError(err);
       }

@@ -15,8 +15,8 @@ class Consumer extends Client {
     // _counter to commit offsets every _numMessages are received
     this._counter = 0;
     this._numMessages = 5;
-    this._kafkaConsumer = new Kafka.KafkaConsumer({
-      // debug: 'all',
+    this.kafkaConsumer = new Kafka.KafkaConsumer({
+      debug: 'all',
       'group.id': 'kafka',
       'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
       'enable.auto.commit': true
@@ -29,11 +29,11 @@ class Consumer extends Client {
    * @return {Promise<void>}
    */
   connect() {
-    return super.connect(this._kafkaConsumer)
+    return super.connect(this.kafkaConsumer)
       .then(() => {
-        this._kafkaConsumer.subscribe([ENV.Topic1Name]);
+        this.kafkaConsumer.subscribe([ENV.Topic1Name]);
         // start consuming messages
-        this._kafkaConsumer.consume((err, message) => {
+        this.kafkaConsumer.consume((err, message) => {
           if (err) {
             console.log(err);
           } else {
@@ -46,7 +46,7 @@ class Consumer extends Client {
   consumeInterval(ms) {
     setInterval(() => {
       console.log('LAWL');
-      this._kafkaConsumer.consume((err, message) => {
+      this.kafkaConsumer.consume((err, message) => {
         if (err) {
           console.log(err);
         } else {
@@ -61,7 +61,7 @@ class Consumer extends Client {
    * @return {Promise<void>}
    */
   disconnect() {
-    return super.disconnect(this._kafkaConsumer);
+    return super.disconnect(this.kafkaConsumer);
   }
 
 
@@ -79,10 +79,10 @@ class Consumer extends Client {
    */
   _initEvent() {
 
-    super.initEvent(this._kafkaConsumer);
+    super.initEvent(this.kafkaConsumer);
 
     // Listen to all messages
-    this._kafkaConsumer.on('data', (m) => {
+    this.kafkaConsumer.on('data', (m) => {
       this._counter++;
 
       // Reset Counter
@@ -90,12 +90,12 @@ class Consumer extends Client {
         this._counter = 0;
       }
 
-      this._kafkaConsumer.commit(m);
+      this.kafkaConsumer.commit(m);
 
       // committing offsets every _numMessages
       if (this._counter % this._numMessages === 0) {
         console.log('Commit Operation:', new Date(), 'Committing...');
-        this._kafkaConsumer.commit(m);
+        this.kafkaConsumer.commit(m);
       }
 
       // Output the actual message contents
