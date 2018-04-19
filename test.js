@@ -12,11 +12,37 @@ describe('Kafka  Test', () => {
     it('Connect', (done) => {
       consumer.connect()
         .then(() => {
-          done();
+          console.log('Client Connected');
+          consumer.message()
+            .subscribe((data) => {
+              done();
+              console.log('Data', data);
+            }, (err) => {
+              console.error('Client Message Subscribe Error', err);
+            });
+          consumer.error()
+            .subscribe((err) => {
+              console.log(err);
+            }, (err) => {
+              console.error('Client Error Subscribe Error', err);
+            });
+          consumer.consumeInterval(100);
+          return producer.connect()
+        })
+        .then(() => {
+          console.log('Producer Connected');
+          const message = {
+            foo: 1,
+            bar: 2
+          };
+          return producer.publish(JSON.stringify(message))
+        })
+        .then(() => {
+          console.log('Publish done');
         })
         .catch((err) => {
-          console.error(err);
-        })
+          console.error('Error', err);
+        });
     });
   });
 });

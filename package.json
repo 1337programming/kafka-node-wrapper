@@ -6,7 +6,7 @@
   "scripts": {
     "start": "docker-compose up",
     "stop": "docker-compose down",
-    "test": "mocha"
+    "test": "mocha --timeout 15000"
   },
   "author": "",
   "license": "ISC",

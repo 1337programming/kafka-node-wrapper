@@ -43,6 +43,19 @@ class Consumer extends Base {
       });
   }
 
+  consumeInterval(ms) {
+    setInterval(() => {
+      console.log('LAWL');
+      this._kafkaConsumer.consume((err, message) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(message);
+        }
+      });
+    }, ms);
+  }
+
   /**
    * Disconnect from Kafka
    * @return {Promise<void>}
