@@ -24,8 +24,7 @@ export interface DirectReport {
  */
 export abstract class Client {
 
-  constructor() {
-  }
+  constructor();
 
   public log(): Observable<Log>;
 

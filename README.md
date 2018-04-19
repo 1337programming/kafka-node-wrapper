@@ -49,6 +49,17 @@ function events() {
     .subscribe((err) => {
       console.log('Producer Error', err);
     });
-}
-```
 
+}
+
+
+// DEMO!
+connect()
+  .then(() => {
+    events();
+    return producer.publish(JSON.stringify({foo: 1, bar: 2}));
+  })
+  .catch((err) => {
+    console.error('Error!', err.message);
+  });
+```
