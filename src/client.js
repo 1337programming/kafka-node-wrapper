@@ -3,16 +3,17 @@ const Subject = require('rxjs').Subject;
 /**
  * Kafka Client base class
  */
-class Client {
+class KafkaClient {
 
   constructor() {
+    this._connected = false;
     this._logDispatcher = new Subject();
     this._errorDispatcher = new Subject();
   }
 
   /**
    * Listen to log stream
-   * @returns {Observable<log>} - log message
+   * @return {Observable<log>} - log message
    */
   log() {
     return this._logDispatcher.asObservable();
@@ -29,13 +30,16 @@ class Client {
   /**
    * Connect to Kafka
    * @protected
+   * @param {KafkaConsumer | Producer | Client | Consumer} kafkaClient - the kafka client (either Kafka Consumer or
+   * Producer
+   * @return {Promise<T>} - arguments from Kafka
    */
-  connect(kafkaClient) {
-    this._check();
+  connectClient(kafkaClient) {
+    this._check(kafkaClient);
     return new Promise((resolve, reject) => {
       kafkaClient
         .connect(null, (data) => {
-          console.log('CONNECT', data);
+          console.log('Connection', data);
         })
         .on('event.error', (error) => {
           console.error('Connect Operation (Error)', `${new Date()}:  Error: ${error}`);
@@ -44,7 +48,8 @@ class Client {
         })
         .on('ready', (args) => {
           console.log('Connect Operation', `${new Date()}: Consumer Ready. Args: ${JSON.stringify(args)}`);
-          return resolve();
+          this._connected = true;
+          return resolve(args);
         });
     });
   }
@@ -52,28 +57,44 @@ class Client {
   /**
    * Disconnect from Kafka
    * @protected
+   * @param {KafkaConsumer | Producer | Client | Consumer} kafkaClient - the kafka client (either Kafka Consumer or
+   * Producer
+   * @return {Promise<void>}
    */
-  disconnect(kafkaClient) {
-    return new Promise((resolve, reject) => {
-      kafkaClient.disconnect()
-        .on('event.error', (err) => {
+  disconnectClient(kafkaClient) {
+    this._check(kafkaClient);
+    if (!this._connected) {
+      throw new Error('Client is already disconnected.');
+    }
+    return new Promise(
+      (resolve, reject) => {
+        kafkaClient.disconnect();
+
+        kafkaClient.on('event.error', (err) => {
           console.error('Disconnect Operation (Error)', `${new Date()}: Error:`, err);
           this._errorDispatcher.next(err);
           return reject(err);
-        })
-        .on('disconnected', (arg) => {
-          console.log('Disconnect Operation', `${new Date()}: Consumer Disconnected: ${JSON.stringify(arg)}`);
+        });
+
+        kafkaClient.on('disconnected', (arg) => {
+          console.log('Disconnect Operation', `${new Date()}: Client Disconnected: ${JSON.stringify(arg)}`);
           return resolve();
         });
-    });
+      })
+      .then(() => {
+        this._connected = false;
+      });
   }
 
   /**
    * Initializes the events
    * @protected
+   * @param {KafkaConsumer | Producer | Client | Consumer} kafkaClient - the kafka client (either Kafka Consumer or
+   * Producer
+   * @return {void}
    */
-  initEvent(kafkaClient) {
-    this._check();
+  initEventLogs(kafkaClient) {
+    this._check(kafkaClient);
     // logging debug messages, if debug is enabled
     kafkaClient.on('event.log', (log) => {
       console.log('Event Log', new Date(), log);
@@ -90,7 +111,8 @@ class Client {
   /**
    * Emit error
    * @protected
-   * @param err - Error to emit
+   * @param {Error} err - Error to emit
+   * @return {void}
    */
   emitError(err) {
     this._errorDispatcher.next(err);
@@ -99,9 +121,12 @@ class Client {
   /**
    * Checks if values are set
    * @private
+   * @param {KafkaConsumer | Producer | Client | Consumer} kafkaClient - the kafka client (either Kafka Consumer or
+   * Producer
+   * @return {void}
    */
   _check(kafkaClient) {
-    if (!kafkaClient && !this._logDispatcher && !this._errorDispatcher) {
+    if (!kafkaClient || !this._logDispatcher || !this._errorDispatcher) {
       throw new Error('Client hasn\'t been set. Make sure to instantiate the class ' +
         '"new Consumer(options)" or "new Producer(options)"');
     }
@@ -109,4 +134,4 @@ class Client {
 
 }
 
-module.exports = Client;
+module.exports = KafkaClient;

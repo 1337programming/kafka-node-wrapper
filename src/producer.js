@@ -1,24 +1,23 @@
-const Kafka = require('node-rdkafka'); // Kafka Node SDK
+const KafkaProducer = require('node-rdkafka').Producer; // Kafka Node SDK
 const ENV = require('dotenv').config().parsed; // Environment
 const Subject = require('rxjs').Subject; // Reactive Extension (helps us structure events)
-const Client = require('./client');
+const KafkaClient = require('./client');
+const DEFAULT_CONFIG = require('./default-config').producer;
 
 /**
  * Kafka Consumer for
  * @param {TopicConfig} topicConfig - the Kafka Topic Configuration
  */
-class Producer extends Client {
+class Producer extends KafkaClient {
 
-  constructor(topicConfig = null) {
+
+  constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
 
+    this._pollLoop = null;
     this._deliveryReportDispatcher = new Subject();
 
-    this.kafkaProducer = new Kafka.Producer({
-      // debug: 'all',
-      'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
-      'dr_cb': true  // delivery report callback
-    }, topicConfig);
+    this.kafkaProducer = new KafkaProducer(conf, topicConfig);
 
     this._initEvent();
   }
@@ -28,9 +27,12 @@ class Producer extends Client {
    * @return {Promise<void>}
    */
   connect() {
-    return super.connect(this.kafkaProducer)
-      .then(() => {
-
+    return super.connectClient(this.kafkaProducer)
+      .then((args) => {
+        console.log('Producer Connection Args', new Date(), args);
+        this._pollLoop = setInterval(() => {
+          this.kafkaProducer.poll();
+        }, ENV.Throttle);
       })
   }
 
@@ -39,7 +41,8 @@ class Producer extends Client {
    * @return {Promise<void>}
    */
   disconnect() {
-    return super.disconnect(this.kafkaProducer);
+    clearInterval(this._pollLoop);
+    return super.disconnectClient(this.kafkaProducer);
   }
 
   /**
@@ -49,7 +52,7 @@ class Producer extends Client {
    *  use librdkafka's default partitioner (consistent random for keyed messages, random for unkeyed messages)
    * @param {String} key - keyed message (optional)
    * @param {String} opaque - opaque token which gets passed along to your delivery reports
-   * @return {Promise<void>}
+   * @return {void}
    * // @TODO fix and review with Prasana
    */
   publish(message, partition = -1, key = null, opaque = null) {
@@ -62,12 +65,9 @@ class Producer extends Client {
         Date.now(),
         opaque
       );
-      this.kafkaProducer.poll();
-      return Promise.resolve();
     } catch (err) {
       console.error('Producer Operation (Error)', new Date(), err);
       super.emitError(err);
-      return Promise.reject();
     }
   }
 
@@ -83,10 +83,11 @@ class Producer extends Client {
   /**
    * Initializes the events
    * @private
+   * @return {void}
    */
   _initEvent() {
 
-    super.initEvent(this.kafkaProducer);
+    super.initEventLogs(this.kafkaProducer);
 
     this.kafkaProducer.on('delivery-report', (err, report) => {
       if (err) {

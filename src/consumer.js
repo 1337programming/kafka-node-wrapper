@@ -1,59 +1,41 @@
-const Kafka = require('node-rdkafka'); // Kafka Node SDK
+const KafkaConsumer = require('node-rdkafka').KafkaConsumer; // Kafka Node SDK
 const ENV = require('dotenv').config().parsed; // Environment
 const Subject = require('rxjs').Subject; // Reactive Extension (helps us structure events)
-const Client = require('./client');
+const KafkaClient = require('./client');
+const DEFAULT_CONFIG = require('./default-config').consumer;
 
 /**
  * Kafka Consumer
  * @param {TopicConfig} topicConfig - the Kafka Topic Configuration
  */
-class Consumer extends Client {
+class Consumer extends KafkaClient {
 
-  constructor(topicConfig = null) {
+  constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
+
+    this._consumeLoop = null;
     this._messageDispatcher = new Subject();
     // _counter to commit offsets every _numMessages are received
     this._counter = 0;
     this._numMessages = 5;
-    this.kafkaConsumer = new Kafka.KafkaConsumer({
-      debug: 'all',
-      'group.id': 'kafka',
-      'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
-      'enable.auto.commit': true
-    }, topicConfig);
+    this.kafkaConsumer = new KafkaConsumer(conf, topicConfig);
     this._initEvent();
   }
 
   /**
    * Connect to Kafka
+   * @Override
    * @return {Promise<void>}
    */
   connect() {
-    return super.connect(this.kafkaConsumer)
-      .then(() => {
-        this.kafkaConsumer.subscribe([ENV.Topic1Name]);
-        // start consuming messages
-        this.kafkaConsumer.consume((err, message) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log(message);
-          }
-        });
-      });
-  }
+    return super.connectClient(this.kafkaConsumer)
+      .then((args) => {
+        console.log('Consumer Connection Args', args);
 
-  consumeInterval(ms) {
-    setInterval(() => {
-      console.log('LAWL');
-      this.kafkaConsumer.consume((err, message) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(message);
-        }
+        this.kafkaConsumer.subscribe([ENV.Topic1Name]);
+
+        this._consume();
       });
-    }, ms);
   }
 
   /**
@@ -61,7 +43,8 @@ class Consumer extends Client {
    * @return {Promise<void>}
    */
   disconnect() {
-    return super.disconnect(this.kafkaConsumer);
+    clearInterval(this._consumeLoop);
+    return super.disconnectClient(this.kafkaConsumer);
   }
 
 
@@ -76,36 +59,51 @@ class Consumer extends Client {
   /**
    * Initializes the events
    * @private
+   * @return {void}
    */
   _initEvent() {
 
-    super.initEvent(this.kafkaConsumer);
+    super.initEventLogs(this.kafkaConsumer);
 
     // Listen to all messages
-    this.kafkaConsumer.on('data', (m) => {
-      this._counter++;
+    this.kafkaConsumer.on('data', (message) => {
+      clearInterval(this._consumeLoop);
 
-      // Reset Counter
-      if (this._counter === 100000) {
-        this._counter = 0;
-      }
-
-      this.kafkaConsumer.commit(m);
-
-      // committing offsets every _numMessages
-      if (this._counter % this._numMessages === 0) {
-        console.log('Commit Operation:', new Date(), 'Committing...');
-        this.kafkaConsumer.commit(m);
-      }
+      this._commit(message);
 
       // Output the actual message contents
       // @TODO remove this after test
-      console.log(JSON.stringify(m));
-      console.log(m.value.toString());
-
-      this._messageDispatcher.next(m.value.toString());
+      console.log(JSON.stringify(message));
+      console.log(message.value.toString());
+      this._messageDispatcher.next(message.value.toString());
 
     });
+  }
+
+  _consume() {
+    this._consumeLoop = setInterval(() => {
+      // start consuming messages
+      this.kafkaConsumer.consume(1);
+    }, ENV.Throttle);
+  }
+
+  _commit(message) {
+
+    // this._counter++;
+    //
+    // // Reset Counter
+    // if (this._counter === 100000) {
+    //   this._counter = 0;
+    // }
+
+    this.kafkaConsumer.commit(message);
+
+    // // committing offsets every _numMessages
+    // if (this._counter % this._numMessages === 0) {
+    //   console.log('Commit Operation:', new Date(), 'Committing...');
+    //   this.kafkaConsumer.commit(m);
+    // }
+
   }
 
 }
