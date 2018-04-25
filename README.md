@@ -63,3 +63,25 @@ connect()
     console.error('Error!', err.message);
   });
 ```
+
+## Configuration
+
+### All
+
+Configurations custom to this wrapper
+
+|   Field    | Description|   Type     | Default   |
+|------------|------------|------------|-----------|
+| throttle   | Throttle interval time (ms) | Number | 500|
+| topics     | Topics to subscribe to  | String[]  | \['kafka-test-topic'\] |
+| autoInterval | Allow auto intervals for polling (producer) and consuming (consumer). | boolean  | true |
+
+### Consumer
+
+Configurations custom to this wrapper's Consumer class.
+
+|   Field    | Description|   Type     | Default   |
+|------------|------------|------------|-----------|
+| consumeMax   | Number of messages to consume for each interval. | Number | 1 |
+
+This rest of the configuration is described [here](https://raw.githubusercontent.com/edenhill/librdkafka/0.11.1.x/CONFIGURATION.md).

@@ -1,11 +1,11 @@
 const KafkaConsumer = require('node-rdkafka').KafkaConsumer; // Kafka Node SDK
-const ENV = require('dotenv').config().parsed; // Environment
 const Subject = require('rxjs').Subject; // Reactive Extension (helps us structure events)
 const KafkaClient = require('./client');
 const DEFAULT_CONFIG = require('./default-config').consumer;
 
 /**
  * Kafka Consumer
+ * @param {ConsumerConfig} conf - defaults to default config
  * @param {TopicConfig} topicConfig - the Kafka Topic Configuration
  */
 class Consumer extends KafkaClient {
@@ -13,12 +13,12 @@ class Consumer extends KafkaClient {
   constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
 
+    Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
+
+    this._config = conf;
     this._consumeLoop = null;
     this._messageDispatcher = new Subject();
-    // _counter to commit offsets every _numMessages are received
-    this._counter = 0;
-    this._numMessages = 5;
-    this.kafkaConsumer = new KafkaConsumer(conf, topicConfig);
+    this.kafkaConsumer = new KafkaConsumer(conf.client, topicConfig);
     this._initEvent();
   }
 
@@ -32,9 +32,10 @@ class Consumer extends KafkaClient {
       .then((args) => {
         console.log('Consumer Connection Args', args);
 
-        this.kafkaConsumer.subscribe([ENV.Topic1Name]);
-
-        this._consume();
+        this.kafkaConsumer.subscribe(this._config.topics);
+        if (this._config.autoInterval) {
+          this._consume();
+        }
       });
   }
 
@@ -47,13 +48,20 @@ class Consumer extends KafkaClient {
     return super.disconnectClient(this.kafkaConsumer);
   }
 
-
   /**
    * Message stream to listen to
    * @return {Observable<T>} - message stream
    */
   message() {
     return this._messageDispatcher.asObservable();
+  }
+
+  /**
+   * Consume message
+   * @param {Number} limit - limit or number of messages to consume
+   */
+  consume(limit = this._config.consumeMax) {
+    this.kafkaConsumer.consume(limit);
   }
 
   /**
@@ -67,7 +75,9 @@ class Consumer extends KafkaClient {
 
     // Listen to all messages
     this.kafkaConsumer.on('data', (message) => {
-      clearInterval(this._consumeLoop);
+      if (this._config.autoInterval) {
+        clearInterval(this._consumeLoop);
+      }
 
       this._commit(message);
 
@@ -83,8 +93,8 @@ class Consumer extends KafkaClient {
   _consume() {
     this._consumeLoop = setInterval(() => {
       // start consuming messages
-      this.kafkaConsumer.consume(1);
-    }, ENV.Throttle);
+      this.kafkaConsumer.consume(this._config.consumeMax);
+    }, this._config.throttle);
   }
 
   _commit(message) {
@@ -96,7 +106,8 @@ class Consumer extends KafkaClient {
     //   this._counter = 0;
     // }
 
-    this.kafkaConsumer.commit(message);
+    // this.kafkaConsumer.commit(message);
+    this.kafkaConsumer.commit();
 
     // // committing offsets every _numMessages
     // if (this._counter % this._numMessages === 0) {

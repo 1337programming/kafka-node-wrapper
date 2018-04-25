@@ -1,12 +1,12 @@
 const KafkaProducer = require('node-rdkafka').Producer; // Kafka Node SDK
-const ENV = require('dotenv').config().parsed; // Environment
 const Subject = require('rxjs').Subject; // Reactive Extension (helps us structure events)
 const KafkaClient = require('./client');
 const DEFAULT_CONFIG = require('./default-config').producer;
 
 /**
- * Kafka Consumer for
- * @param {TopicConfig} topicConfig - the Kafka Topic Configuration
+ * Kafka Producer
+ * @param {ProducerConfig} conf - defaults to default config
+ * @param {Config} topicConfig - the Kafka Topic Configuration
  */
 class Producer extends KafkaClient {
 
@@ -14,11 +14,12 @@ class Producer extends KafkaClient {
   constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
 
+    Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
+
+    this.config = conf;
     this._pollLoop = null;
     this._deliveryReportDispatcher = new Subject();
-
-    this.kafkaProducer = new KafkaProducer(conf, topicConfig);
-
+    this.kafkaProducer = new KafkaProducer(conf.client, topicConfig);
     this._initEvent();
   }
 
@@ -32,7 +33,7 @@ class Producer extends KafkaClient {
         console.log('Producer Connection Args', new Date(), args);
         this._pollLoop = setInterval(() => {
           this.kafkaProducer.poll();
-        }, ENV.Throttle);
+        }, this.config.throttle);
       })
   }
 
@@ -48,6 +49,7 @@ class Producer extends KafkaClient {
   /**
    * Publish a message
    * @param {String} message - message to send
+   * @param {String} topic - topic to send to
    * @param {Number} partition - optionally  specify a partition for the message, this defaults to -1 - which will
    *  use librdkafka's default partitioner (consistent random for keyed messages, random for unkeyed messages)
    * @param {String} key - keyed message (optional)
@@ -55,10 +57,10 @@ class Producer extends KafkaClient {
    * @return {void}
    * // @TODO fix and review with Prasana
    */
-  publish(message, partition = -1, key = null, opaque = null) {
+  publish(message, topic = DEFAULT_CONFIG.topics[0], partition = -1, key = null, opaque = null) {
     try {
       this.kafkaProducer.produce(
-        ENV.Topic1Name,
+        topic,
         partition,
         new Buffer.from(message),
         key,
@@ -73,7 +75,7 @@ class Producer extends KafkaClient {
 
   /**
    * Stream delivery report from the kafka producer
-   * @return {Observable<T>}
+   * @return {Observable<DeliveryReport>}
    */
   report() {
     return this._deliveryReportDispatcher.asObservable();

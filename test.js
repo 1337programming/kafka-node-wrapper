@@ -1,7 +1,9 @@
 const assert = require('assert');
 const expect = require('chai').expect;
+const sample = require('./sample');
 
 const Kafka = require('./src/index');
+
 
 describe('Kafka  Test', () => {
 
@@ -10,7 +12,7 @@ describe('Kafka  Test', () => {
 
   describe('Consumer', () => {
 
-    it('Connect & Disconnect', () => {
+    /*it('Connect & Disconnect', () => {
       return Promise.all([producer.connect(), consumer.connect()])
         .then(() => {
           return Promise.all([producer.disconnect(), consumer.disconnect()]);
@@ -19,43 +21,24 @@ describe('Kafka  Test', () => {
           return 'Success';
         })
         .catch((err) => {
-          console.error('Error', err);
+          console.error('TEST Error', err);
           throw new Error(err);
         })
-    });
+    });*/
 
     it('Pub Sub', () => {
-      let store;
+      let message;
       return Promise.all([producer.connect(), consumer.connect()])
         .then(() => {
-          console.log('Client and Producer Connected');
-          consumer.message()
-            .subscribe((data) => {
-              store = data;
-              console.log('Data', data);
-            }, (err) => {
-              console.error('Client Message Subscribe Error', err);
-            });
-          consumer.error()
-            .subscribe((err) => {
-              console.log('Client Error', err);
-            }, (err) => {
-              console.error('Client Error Subscribe Error', err);
-            });
-          producer.error()
-            .subscribe((err) => {
-              console.log('Producer Error:', err);
-            });
-          producer.report()
-            .subscribe((report) => {
-              console.log('Producer Delivery Report:', report);
-            });
-          const message = {
-            foo: 1,
-            bar: 2
-          };
-          producer.publish(JSON.stringify(message));
-          expect(store).to.equal('balls');
+          return Promise.all([sample.consumerEvent(consumer), sample.producerEvent(producer)]);
+        })
+        .then((data) => {
+          console.log('DATA', data);
+          expect(JSON.parse(data[0])).to.equal(message);
+          return Promise.all([consumer.disconnect(), producer.disconnect()]);
+        })
+        .then(() => {
+          console.log('Disconnected');
         })
         .catch((err) => {
           console.error('Error', err);

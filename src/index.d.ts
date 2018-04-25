@@ -7,33 +7,152 @@ export interface Log {
   severity: number;
 }
 
+/**
+ * Custom configuration for this wrapper
+ */
 export interface Config {
-  'metadata.broker.list'?: string;
-  'security.protocol'?: string;
-  'enable.auto.commit'?: boolean;
-  'sasl.mechanisms'?: string;
-  'sasl.username'?: string;
-  'sasl.password'?: string;
-  'ssl.ca.location'?: string;
+  topics?: string[];
+  throttle?: number;
+  autoInterval?: boolean;
+  client: KafkaConfig
 }
 
 export interface ConsumerConfig extends Config {
-  'group.id'?: string
-  offset_commit_cb?: (err: Error, topicPartitions: any) => any;
-  rebalance_cb?: (err: Error, assignment: any) => any;
+  consumeMax?: number;
+  client: KafkaConsumerConfig;
 }
 
-export interface TopicConfig extends Config {
-  'client.id': string;
-  'compression.codec': string | 'gzip' | 'snappy' | 'none';
-  'retry.backoff.ms': number;
-  'message.send.max.retries': number;
-  'socket.keepalive.enable': boolean;
-  'queue.buffering.max.messages': number;
-  'queue.buffering.max.ms': number;
-  'batch.num.messages': number;
-  dr_cb: boolean;
-  dr_msg_cb: boolean;
+export interface ProducerConfig extends Config {
+  client: KafkaProducerConfig;
+}
+
+/**
+ * Configuration from rdkafka
+ */
+export interface KafkaConfig {
+  'builtin.features'?: string; // gzip, snappy, ssl, sasl, regex, lz4, sasl_gssapi, sasl_plain, sasl_scram, plugins
+  'client.id'?: string;
+  'metadata.broker.list'?: string;
+  'bootstrap.servers'?: string;
+  'message.max.bytes'?: number;
+  'message.copy.max.bytes'?: number;
+  'receive.message.max.bytes': number;
+  'max.in.flight.requests.per.connection'?: number;
+  'max.in.flight'?: number;
+  'metadata.request.timeout.ms'?: number;
+  'topic.metadata.refresh.interval.ms'?: number;
+  'metadata.max.age.ms'?: number;
+  'topic.metadata.refresh.fast.interval.ms'?: number;
+  'topic.metadata.refresh.fast.cnt'?: number;
+  'topic.metadata.refresh.sparse'?: number;
+  'topic.blacklist': string[];
+  'debug'?: string;
+  'socket.timeout.ms'?: number;
+  'socket.blocking.max.ms'?: number;
+  'socket.send.buffer.bytes'?: number;
+  'socket.receive.buffer.bytes'?: number;
+  'socket.keepalive.enable'?: boolean;
+  'socket.nagle.disable'?: boolean;
+  'socket.max.fails'?: number;
+  'broker.address.ttl'?: number;
+  'broker.address.family'?: 'any' | 'v4' | 'v6';
+  'reconnect.backoff.jitter.ms'?: number;
+  'statistics.interval.ms'?: number;
+  enabled_events?: number;
+  error_cb?: Function;
+  throttle_cb?: Function;
+  stats_cb?: Function;
+  log_cb?: Function;
+  log_level?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  'log.queue'?: boolean;
+  'log.thread.name'?: boolean;
+  'log.connection.close'?: boolean;
+  socket_cb?: Function;
+  connect_cb?: Function;
+  closesocket_cb?: Function;
+  open_cb?: Function;
+  'opaque'?: any;
+  default_topic_conf?: any;
+  'internal.termination.signal'?: number;
+  'api.version.request.timeout.ms'?: number;
+  'api.version.fallback.ms'?: number;
+  'broker.version.fallback'?: string;
+  'security.protocol'?: 'plaintext' | 'ssl' | 'sasl_plaintext' | 'sasl_ssl';
+  'ssl.cipher.suites'?: string;
+  'ssl.key.location'?: string;
+  'ssl.key.password'?: string;
+  'ssl.certificate.location'?: string;
+  'ssl.ca.location'?: string;
+  'ssl.crl.location'?: string;
+  'sasl.mechanisms'?: 'GSSAPI' | 'PLAIN' | 'SCRAM-SHA-256' |'SCRAM-SHA-512'
+  'sasl.kerberos.service.name'?: string;
+  'sasl.kerberos.principal'?: string;
+  'sasl.kerberos.kinit.cmd'?: string;
+  'sasl.kerberos.keytab'?: string;
+  'sasl.kerberos.min.time.before.relogin'?: number;
+  'sasl.username'?: string;
+  'sasl.password'?: string;
+  'plugin.library.paths'?: string;
+  interceptors?: any;
+  'group.id'?: string;
+  'partition.assignment.strategy'?: string;
+  'session.timeout.ms'?: number;
+  'heartbeat.interval.ms'?: number;
+  'group.protocol.type'?: string;
+  'coordinator.query.interval.ms'?: number;
+}
+
+export interface KafkaConsumerConfig extends KafkaConfig {
+  'enable.auto.commit'?: boolean;
+  'auto.commit.interval.ms'?: number;
+  'enable.auto.offset.store'?: number;
+  'queued.min.messages'?: number;
+  'queued.max.messages.kbytes'?: number;
+  'fetch.wait.max.ms'?: number;
+  'fetch.message.max.bytes'?: number;
+  'max.partition.fetch.bytes'?: number;
+  'fetch.min.bytes'?: number;
+  'fetch.error.backoff.ms'?: number;
+  'offset.store.method'?: 'none' | 'file' | 'broker';
+  consume_cb?: Function;
+  rebalance_cb?: Function;
+  offset_commit_cb?: Function;
+  'enable.partition.eof'?: boolean;
+  'check.crcs'?: boolean;
+}
+
+export interface KafkaProducerConfig extends KafkaConfig {
+  'queue.buffering.max.messages'?: number;
+  'queue.buffering.max.kbytes'?: number;
+  'queue.buffering.max.ms'?: number;
+  'linger.ms'?: number;
+  'message.send.max.retries'?: number;
+  retries?: number;
+  'retry.backoff.ms'?: number;
+  'compression.codec'?: 'none' | 'gzip' | 'snappy' | 'lz4';
+  'batch.num.messages'?: number;
+  'delivery.report.only.error'?: boolean;
+  dr_cb?: Function;
+  dr_msg_cb?: Function;
+}
+
+export interface TopicConfig {
+  'request.required.acks'?: number;
+  acks?: number;
+  'request.timeout.ms'?: number;
+  'message.timeout.ms'?: number;
+  'produce.offset.report'?: boolean;
+  partitioner_cb?: Function;
+  opaque?: Function;
+  'compression.codec'?: 'none' | 'gzip' | 'snappy' | 'lz4' | 'inherit';
+  'auto.commit.enable'?: boolean;
+  'enable.auto.commit'?: boolean;
+  'auto.commit.interval.ms'?: number;
+  'auto.offset.reset'?: 'smallest' | 'earliest' | 'beginning' | 'largest' | 'latest' | 'end' | 'error';
+  'offset.store.path'?: string;
+  'offset.store.sync.interval.ms'?: number;
+  'offset.store.method'?: 'file' | 'broker';
+  'consume.callback.max.messages'?: number;
 }
 
 export interface MessagePayload {
@@ -46,7 +165,7 @@ export interface MessagePayload {
   timestamp: number; // timestamp of message creation
 }
 
-export interface DirectReport {
+export interface DeliveryReport {
 
 }
 
@@ -78,7 +197,7 @@ export class Consumer extends Client {
 
   public kafkaConsumer: Kafka.KafkaConsumer;
 
-  constructor(topicConfig?: TopicConfig);
+  constructor(conf: ConsumerConfig, topicConfig?: TopicConfig);
 
   public message(): Observable<MessagePayload>;
 
@@ -94,11 +213,11 @@ export class Producer extends Client {
 
   public kafkaProducer: Kafka.Producer;
 
-  constructor(topicConfig: TopicConfig);
+  constructor(conf: ProducerConfig, topicConfig: TopicConfig);
 
-  public publish(message: string, partition?: number, key?: string, opaque?: string): void;
+  public publish(message: string, topic?: string, partition?: number, key?: string, opaque?: string): void;
 
-  public report(): Observable<DirectReport>;
+  public report(): Observable<DeliveryReport>;
 
   public connect(): Promise<{ name: string }>;
 
