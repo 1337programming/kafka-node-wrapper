@@ -1,7 +1,6 @@
 # Kafka Docker Wrapper
 
 ### Running
-TEST
 
 * run `npm install`
 * run `docker-compose up`
@@ -15,7 +14,7 @@ If you are getting an error about the topic not existing, try running `docker-co
 ## Use
 
 Install
-`$ npm install`
+`$ npm install kafka-node-wrapper --save`
 
 ```javascript
 const Kafka = require('kafka-node-wrapper'); // Node < 9.x
