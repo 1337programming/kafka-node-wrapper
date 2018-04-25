@@ -1,4 +1,4 @@
-const Kafka = require('./src/index');
+const KafkaWrapper = require('./src/index');
 
 
 // Example override Usage
@@ -33,8 +33,8 @@ class SampleOverride {
 
   constructor() {
     this.limit = 10;
-    this.consumer = new Kafka.consumer({consumeMax: this.limit, autoInterval: false});
-    this.producer = new Kafka.producer();
+    this.consumer = new KafkaWrapper.consumer({consumeMax: this.limit, autoInterval: false});
+    this.producer = new KafkaWrapper.producer();
   }
 
   async run(message) {
@@ -50,51 +50,10 @@ class SampleOverride {
   }
 
   async process(message): void {
-
+    await cbWrapper(message);
+    await doStuff(message);
+    this.consumer.consume(1);
+    this.consumer.commit()
   }
 
-  async operation(message) {
-
-  }
-
 }
-async function main() {
-  // Connect
-  await producer.connect();
-  await consumer.connect();
-
-
-}
-
-async function process() {
-
-}
-
-
-function main() {
-
-  Promise.all([consumer.connect(), producer.connect()])
-    .then(() => {
-      return Promise.all([consumerEvent(consumer), producerEvent(producer)]);
-    })
-    .then((data) => {
-      console.log('DATA', data);
-      return Promise.all([consumer.disconnect(), producer.disconnect()]);
-    })
-    .then(() => {
-      console.log('Disconnected');
-    })
-    .catch((err) => {
-      console.error('Error', err);
-    });
-
-}
-
-// main();
-
-module.exports = {
-  consumer: consumer,
-  producer: producer,
-  consumerEvent: consumerEvent,
-  producerEvent: producerEvent
-};

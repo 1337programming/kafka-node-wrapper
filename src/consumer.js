@@ -58,10 +58,18 @@ class Consumer extends KafkaClient {
 
   /**
    * Consume message
-   * @param {Number} limit - limit or number of messages to consume
+   * @param {number} limit - limit or number of messages to consume
    */
   consume(limit = this._config.consumeMax) {
     this.kafkaConsumer.consume(limit);
+  }
+
+  /**
+   * Manual Commit
+   * @optional @param {string=} topicPartition - topic partition to commit
+   */
+  commit(topicPartition) {
+    this.kafkaConsumer.commit(topicPartition)
   }
 
   /**
@@ -79,7 +87,7 @@ class Consumer extends KafkaClient {
         clearInterval(this._consumeLoop);
       }
 
-      this._commit(message);
+      this.kafkaConsumer.commit();
 
       // Output the actual message contents
       // @TODO remove this after test
@@ -95,26 +103,6 @@ class Consumer extends KafkaClient {
       // start consuming messages
       this.kafkaConsumer.consume(this._config.consumeMax);
     }, this._config.throttle);
-  }
-
-  _commit(message) {
-
-    // this._counter++;
-    //
-    // // Reset Counter
-    // if (this._counter === 100000) {
-    //   this._counter = 0;
-    // }
-
-    // this.kafkaConsumer.commit(message);
-    this.kafkaConsumer.commit();
-
-    // // committing offsets every _numMessages
-    // if (this._counter % this._numMessages === 0) {
-    //   console.log('Commit Operation:', new Date(), 'Committing...');
-    //   this.kafkaConsumer.commit(m);
-    // }
-
   }
 
 }

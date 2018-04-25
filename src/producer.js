@@ -1,5 +1,6 @@
 const KafkaProducer = require('node-rdkafka').Producer; // Kafka Node SDK
 const Subject = require('rxjs').Subject; // Reactive Extension (helps us structure events)
+const toPromise = require('rxjs/operator/toPromise');
 const KafkaClient = require('./client');
 const DEFAULT_CONFIG = require('./default-config').producer;
 
@@ -9,7 +10,6 @@ const DEFAULT_CONFIG = require('./default-config').producer;
  * @param {Config} topicConfig - the Kafka Topic Configuration
  */
 class Producer extends KafkaClient {
-
 
   constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
@@ -34,7 +34,7 @@ class Producer extends KafkaClient {
         this._pollLoop = setInterval(() => {
           this.kafkaProducer.poll();
         }, this.config.throttle);
-      })
+      });
   }
 
   /**
@@ -50,12 +50,11 @@ class Producer extends KafkaClient {
    * Publish a message
    * @param {String} message - message to send
    * @param {String} topic - topic to send to
-   * @param {Number} partition - optionally  specify a partition for the message, this defaults to -1 - which will
+   * @param {number} partition - optionally  specify a partition for the message, this defaults to -1 - which will
    *  use librdkafka's default partitioner (consistent random for keyed messages, random for unkeyed messages)
    * @param {String} key - keyed message (optional)
    * @param {String} opaque - opaque token which gets passed along to your delivery reports
-   * @return {void}
-   * // @TODO fix and review with Prasana
+   * @return {Promise<DeliveryReport>}
    */
   publish(message, topic = DEFAULT_CONFIG.topics[0], partition = -1, key = null, opaque = null) {
     try {
@@ -67,9 +66,14 @@ class Producer extends KafkaClient {
         Date.now(),
         opaque
       );
+
+      return this._deliveryReportDispatcher.asObservable() // Convert Observable to Promise
+        .pipe(toPromise());
+
     } catch (err) {
       console.error('Producer Operation (Error)', new Date(), err);
       super.emitError(err);
+      return reject(err);
     }
   }
 
@@ -93,7 +97,7 @@ class Producer extends KafkaClient {
 
     this.kafkaProducer.on('delivery-report', (err, report) => {
       if (err) {
-        this.emitError(err);
+        super.emitError(err);
       }
       console.log('Delivery Report Operation:', new Date(), report);
       this._deliveryReportDispatcher.next(report);

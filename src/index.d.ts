@@ -203,6 +203,10 @@ export class Consumer extends Client {
 
   public connect(): Promise<{ name: string }>;
 
+  public comsume(): void;
+
+  public commit(topicPartition: number): void
+
   public disconnect(): Promise<void>;
 
   private _initEvent(): void;
@@ -215,7 +219,7 @@ export class Producer extends Client {
 
   constructor(conf: ProducerConfig, topicConfig: TopicConfig);
 
-  public publish(message: string, topic?: string, partition?: number, key?: string, opaque?: string): void;
+  public publish(message: string, topic?: string, partition?: number, key?: string, opaque?: string): Promise<DeliveryReport>;
 
   public report(): Observable<DeliveryReport>;
 
