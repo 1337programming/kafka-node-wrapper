@@ -84,7 +84,7 @@ export interface KafkaConfig {
   'ssl.certificate.location'?: string;
   'ssl.ca.location'?: string;
   'ssl.crl.location'?: string;
-  'sasl.mechanisms'?: 'GSSAPI' | 'PLAIN' | 'SCRAM-SHA-256' |'SCRAM-SHA-512'
+  'sasl.mechanisms'?: 'GSSAPI' | 'PLAIN' | 'SCRAM-SHA-256' | 'SCRAM-SHA-512'
   'sasl.kerberos.service.name'?: string;
   'sasl.kerberos.principal'?: string;
   'sasl.kerberos.kinit.cmd'?: string;
@@ -203,11 +203,11 @@ export class Consumer extends Client {
 
   public connect(): Promise<{ name: string }>;
 
+  public disconnect(): Promise<void>;
+
   public comsume(): void;
 
   public commit(topicPartition: number): void
-
-  public disconnect(): Promise<void>;
 
   private _initEvent(): void;
 
@@ -226,6 +226,8 @@ export class Producer extends Client {
   public connect(): Promise<{ name: string }>;
 
   public disconnect(): Promise<void>;
+
+  public poll(): void;
 
   private _initEvent(): void;
 }

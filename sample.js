@@ -19,6 +19,7 @@ function consumerEvent(con) {
         reject(err);
         console.log('SAMPLE Consumer Error:', err);
       });
+    console.log('SAMPLE Consumer Connected');
     con.log()
       .subscribe((log) => {
         console.log('SAMPLE log', log);
@@ -70,7 +71,7 @@ function main() {
 
 }
 
-// main();
+main();
 
 module.exports = {
   consumer: consumer,

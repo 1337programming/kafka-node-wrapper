@@ -65,6 +65,8 @@ Manual Commit
 
 <a name="Producer"></a>
 
+<a name="Producer"></a>
+
 ## Producer
 Kafka Producer
 
@@ -75,6 +77,7 @@ Kafka Producer
     * [.connect()](#Producer+connect) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.disconnect()](#Producer+disconnect) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.publish(message, topic, partition, key, opaque)](#Producer+publish) ⇒ <code>Promise.&lt;DeliveryReport&gt;</code>
+    * [.poll()](#Producer+poll)
     * [.report()](#Producer+report) ⇒ <code>Observable.&lt;DeliveryReport&gt;</code>
 
 <a name="new_Producer_new"></a>
@@ -113,6 +116,12 @@ Publish a message
 | key | <code>String</code> | <code></code> | keyed message (optional) |
 | opaque | <code>String</code> | <code></code> | opaque token which gets passed along to your delivery reports |
 
+<a name="Producer+poll"></a>
+
+### producer.poll()
+Polls the producer for delivery reports or other events to be transmitted via the emitter.
+
+**Kind**: instance method of [<code>Producer</code>](#Producer)
 <a name="Producer+report"></a>
 
 ### producer.report() ⇒ <code>Observable.&lt;DeliveryReport&gt;</code>

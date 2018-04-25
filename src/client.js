@@ -70,7 +70,7 @@ class KafkaClient {
       (resolve, reject) => {
         kafkaClient.disconnect();
 
-        kafkaClient.on('event.error', (err) => {
+        kafkaClient.prependListener('event.error', (err) => {
           console.error('Disconnect Operation (Error)', `${new Date()}: Error:`, err);
           this._errorDispatcher.next(err);
           return reject(err);

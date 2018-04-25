@@ -42,18 +42,21 @@ class SampleOverride {
     await this.producer.connect();
     this.consumer.consume(); // Init
     this.consumer.message().subscribe(async (message) => {
-      await process(message);
+      await this.process(message);
     });
     this.consumer.error().subscribe((err) => {
       /// log errors
     });
   }
 
-  async process(message): void {
+  async process(message) {
     await cbWrapper(message);
     await doStuff(message);
     this.consumer.consume(1);
-    this.consumer.commit()
+    this.consumer.commit();
   }
 
 }
+
+const override = new SampleOverride();
+override.run();

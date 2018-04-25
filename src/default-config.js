@@ -13,7 +13,7 @@ module.exports = {
     },
     topics: [ENV.Topic1Name],
     throttle: ENV.Throttle,
-    autoInterval: false,
+    autoInterval: true,
     consumeMax: 1
   },
   producer: {
@@ -24,7 +24,7 @@ module.exports = {
     },
     topics: [ENV.Topic1Name],
     throttle: ENV.Throttle,
-    autoInterval: false
+    autoInterval: true
   },
 
 };

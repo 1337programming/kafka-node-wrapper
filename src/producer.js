@@ -1,6 +1,6 @@
 const KafkaProducer = require('node-rdkafka').Producer; // Kafka Node SDK
-const Subject = require('rxjs').Subject; // Reactive Extension (helps us structure events)
-const toPromise = require('rxjs/operator/toPromise');
+const {Subject, Observable} = require('rxjs'); // Reactive Extension (helps us structure events)
+require('rxjs/add/operator/toPromise');
 const KafkaClient = require('./client');
 const DEFAULT_CONFIG = require('./default-config').producer;
 
@@ -16,7 +16,7 @@ class Producer extends KafkaClient {
 
     Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
 
-    this.config = conf;
+    this._config = conf;
     this._pollLoop = null;
     this._deliveryReportDispatcher = new Subject();
     this.kafkaProducer = new KafkaProducer(conf.client, topicConfig);
@@ -31,9 +31,11 @@ class Producer extends KafkaClient {
     return super.connectClient(this.kafkaProducer)
       .then((args) => {
         console.log('Producer Connection Args', new Date(), args);
-        this._pollLoop = setInterval(() => {
-          this.kafkaProducer.poll();
-        }, this.config.throttle);
+        if (this._config.autoInterval) {
+          this._pollLoop = setInterval(() => {
+            this.kafkaProducer.poll();
+          }, this._config.throttle);
+        }
       });
   }
 
@@ -42,7 +44,9 @@ class Producer extends KafkaClient {
    * @return {Promise<void>}
    */
   disconnect() {
-    clearInterval(this._pollLoop);
+    if (this._config.autoInterval) {
+      clearInterval(this._pollLoop);
+    }
     return super.disconnectClient(this.kafkaProducer);
   }
 
@@ -57,24 +61,40 @@ class Producer extends KafkaClient {
    * @return {Promise<DeliveryReport>}
    */
   publish(message, topic = DEFAULT_CONFIG.topics[0], partition = -1, key = null, opaque = null) {
-    try {
-      this.kafkaProducer.produce(
-        topic,
-        partition,
-        new Buffer.from(message),
-        key,
-        Date.now(),
-        opaque
-      );
+    return new Promise((resolve, reject) => {
 
-      return this._deliveryReportDispatcher.asObservable() // Convert Observable to Promise
-        .pipe(toPromise());
+      try {
+        this.kafkaProducer.produce(
+          topic,
+          partition,
+          new Buffer.from(message),
+          key,
+          Date.now(),
+          opaque
+        );
 
-    } catch (err) {
-      console.error('Producer Operation (Error)', new Date(), err);
-      super.emitError(err);
-      return reject(err);
-    }
+        this.kafkaProducer.prependListener('delivery-report', (err, report) => {
+          if (err) {
+            super.emitError(err);
+          }
+          console.log('Delivery Report Operation:', new Date(), report);
+          this._deliveryReportDispatcher.next(report);
+          resolve(report);
+        });
+
+      } catch (err) {
+        console.error('Producer Operation (Error)', new Date(), err);
+        super.emitError(err);
+        return Promise.reject(err);
+      }
+    });
+  }
+
+  /**
+   * Polls the producer for delivery reports or other events to be transmitted via the emitter.
+   */
+  poll() {
+    this.kafkaProducer.poll();
   }
 
   /**
