@@ -1,5 +1,5 @@
-const KafkaConsumer = require('node-rdkafka').KafkaConsumer; // Kafka Node SDK
-const Subject = require('rxjs').Subject; // Reactive Extension (helps us structure events)
+const { KafkaConsumer } = require('node-rdkafka'); // Kafka Node SDK
+const { Subject } = require('rxjs'); // Reactive Extension (helps us structure events)
 const KafkaClient = require('./client');
 const DEFAULT_CONFIG = require('./default-config').consumer;
 
