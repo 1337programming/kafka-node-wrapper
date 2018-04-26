@@ -71,7 +71,7 @@ function main() {
 
 }
 
-main();
+// main();
 
 module.exports = {
   consumer: consumer,
