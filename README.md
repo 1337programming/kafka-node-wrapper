@@ -84,3 +84,8 @@ Configurations custom to this wrapper's Consumer class.
 | consumeMax   | Number of messages to consume for each interval. | Number | 1 |
 
 This rest of the configuration is described [here](https://raw.githubusercontent.com/edenhill/librdkafka/0.11.1.x/CONFIGURATION.md).
+
+### TODO
+
+- [ ] Tests
+- [ ] Linting

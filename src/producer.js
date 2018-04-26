@@ -6,20 +6,19 @@ const DEFAULT_CONFIG = require('./default-config').producer;
 
 /**
  * Kafka Producer
- * @param {ProducerConfig} conf - defaults to default config
- * @param {Config} topicConfig - the Kafka Topic Configuration
+ * @param {ProducerConfig} [conf=DEFAULT_CONFIG] - defaults to default config
+ * @param {Config} [topicConfig=null] - the Kafka Topic Configuration
  */
 class Producer extends KafkaClient {
 
   constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
 
-    Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
+    this._config = Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
 
-    this._config = conf;
     this._pollLoop = null;
     this._deliveryReportDispatcher = new Subject();
-    this.kafkaProducer = new KafkaProducer(conf.client, topicConfig);
+    this.kafkaProducer = new KafkaProducer(this._config.client, topicConfig);
     this._initEvent();
   }
 
@@ -53,14 +52,14 @@ class Producer extends KafkaClient {
   /**
    * Publish a message
    * @param {String} message - message to send
-   * @param {String} topic - topic to send to
-   * @param {number} partition - optionally  specify a partition for the message, this defaults to -1 - which will
+   * @param {String} [topic=this._config.topics[0]] - topic to send to
+   * @param {number} [partition=-1] - optionally  specify a partition for the message, this defaults to -1 - which will
    *  use librdkafka's default partitioner (consistent random for keyed messages, random for unkeyed messages)
-   * @param {String} key - keyed message (optional)
-   * @param {String} opaque - opaque token which gets passed along to your delivery reports
+   * @param {String} [key=null] - keyed message (optional)
+   * @param {String} [opaque=null] - opaque token which gets passed along to your delivery reports
    * @return {Promise<DeliveryReport>}
    */
-  publish(message, topic = DEFAULT_CONFIG.topics[0], partition = -1, key = null, opaque = null) {
+  publish(message, topic = this._config.topics[0], partition = -1, key = null, opaque = null) {
     return new Promise((resolve, reject) => {
 
       try {

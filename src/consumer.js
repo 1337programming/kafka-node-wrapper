@@ -5,20 +5,19 @@ const DEFAULT_CONFIG = require('./default-config').consumer;
 
 /**
  * Kafka Consumer
- * @param {ConsumerConfig} conf - defaults to default config
- * @param {TopicConfig} topicConfig - the Kafka Topic Configuration
+ * @param {ConsumerConfig} [conf=DEFAULT_CONFIG] - defaults to default config
+ * @param {TopicConfig} [topicConfig=null] - the Kafka Topic Configuration
  */
 class Consumer extends KafkaClient {
 
   constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
 
-    Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
+    this._config = Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
 
-    this._config = conf;
     this._consumeLoop = null;
     this._messageDispatcher = new Subject();
-    this.kafkaConsumer = new KafkaConsumer(conf.client, topicConfig);
+    this.kafkaConsumer = new KafkaConsumer(this._config.client, topicConfig);
     this._initEvent();
   }
 
@@ -58,7 +57,7 @@ class Consumer extends KafkaClient {
 
   /**
    * Consume message
-   * @param {number} limit - limit or number of messages to consume
+   * @param {number} [limit = this._config.consumeMax] - limit or number of messages to consume
    */
   consume(limit = this._config.consumeMax) {
     this.kafkaConsumer.consume(limit);
@@ -66,7 +65,7 @@ class Consumer extends KafkaClient {
 
   /**
    * Manual Commit
-   * @optional @param {string=} topicPartition - topic partition to commit
+   * @param {string} [topicPartition] - topic partition to commit
    */
   commit(topicPartition) {
     this.kafkaConsumer.commit(topicPartition)

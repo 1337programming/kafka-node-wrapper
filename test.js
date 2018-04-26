@@ -12,7 +12,7 @@ describe('Kafka  Test', () => {
 
   describe('Consumer', () => {
 
-    /*it('Connect & Disconnect', () => {
+    it('Connect & Disconnect', () => {
       return Promise.all([producer.connect(), consumer.connect()])
         .then(() => {
           return Promise.all([producer.disconnect(), consumer.disconnect()]);
@@ -24,7 +24,7 @@ describe('Kafka  Test', () => {
           console.error('TEST Error', err);
           throw new Error(err);
         })
-    });*/
+    });
 
     it('Pub Sub', () => {
       let message;
