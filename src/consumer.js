@@ -1,5 +1,5 @@
-const { KafkaConsumer } = require('node-rdkafka'); // Kafka Node SDK
-const { Subject } = require('rxjs'); // Reactive Extension (helps us structure events)
+const {KafkaConsumer} = require('node-rdkafka'); // Kafka Node SDK
+const {Subject} = require('rxjs'); // Reactive Extension (helps us structure events)
 const KafkaClient = require('./client');
 const DEFAULT_CONFIG = require('./default-config').consumer;
 
@@ -10,6 +10,11 @@ const DEFAULT_CONFIG = require('./default-config').consumer;
  */
 class Consumer extends KafkaClient {
 
+  /**
+   * Kafka Consumer
+   * @param {ConsumerConfig} [conf=DEFAULT_CONFIG] - defaults to default config
+   * @param {TopicConfig} [topicConfig=null] - the Kafka Topic Configuration
+   */
   constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
 
@@ -68,7 +73,7 @@ class Consumer extends KafkaClient {
    * @param {string} [topicPartition] - topic partition to commit
    */
   commit(topicPartition) {
-    this.kafkaConsumer.commit(topicPartition)
+    this.kafkaConsumer.commit(topicPartition);
   }
 
   /**
@@ -97,6 +102,10 @@ class Consumer extends KafkaClient {
     });
   }
 
+  /**
+   * Consume event
+   * @private
+   */
   _consume() {
     this._consumeLoop = setInterval(() => {
       // start consuming messages

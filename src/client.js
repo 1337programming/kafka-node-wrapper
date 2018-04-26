@@ -4,7 +4,10 @@ const Subject = require('rxjs').Subject;
  * Kafka Client base class
  */
 class KafkaClient {
-  
+
+  /**
+   * Creates events
+   */
   constructor() {
     this._connected = false;
     this._logDispatcher = new Subject();

@@ -1,5 +1,5 @@
 const KafkaProducer = require('node-rdkafka').Producer; // Kafka Node SDK
-const {Subject, Observable} = require('rxjs'); // Reactive Extension (helps us structure events)
+const {Subject} = require('rxjs'); // Reactive Extension (helps us structure events)
 require('rxjs/add/operator/toPromise');
 const KafkaClient = require('./client');
 const DEFAULT_CONFIG = require('./default-config').producer;
@@ -11,6 +11,10 @@ const DEFAULT_CONFIG = require('./default-config').producer;
  */
 class Producer extends KafkaClient {
 
+  /**
+   * @param {ProducerConfig} [conf=DEFAULT_CONFIG] - defaults to default config
+   * @param {Config} [topicConfig=null] - the Kafka Topic Configuration
+   */
   constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
     super();
 
@@ -66,6 +70,7 @@ class Producer extends KafkaClient {
         this.kafkaProducer.produce(
           topic,
           partition,
+          // eslint-disable-next-line new-cap
           new Buffer.from(message),
           key,
           Date.now(),

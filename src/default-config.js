@@ -20,11 +20,10 @@ module.exports = {
     client: {
       // debug: 'all',
       'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
-      'dr_cb': true, // delivery report callback
+      'dr_cb': true // delivery report callback
     },
     topics: [ENV.Topic1Name],
     throttle: ENV.Throttle,
     autoInterval: true
-  },
-
+  }
 };

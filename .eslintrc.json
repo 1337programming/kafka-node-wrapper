@@ -2,8 +2,27 @@
   "parserOptions": {
     "ecmaVersion": 6
   },
+  "env": {
+    "node": true
+  },
   "extends": "google",
   "rules": {
-    "no-trailing-spaces": "0"
+    "no-trailing-spaces": "off",
+    "max-len": [
+      "error",
+      {
+        "code": 120
+      }
+    ],
+    "padded-blocks": [
+      "error",
+      {
+        "classes": "always"
+      }
+    ],
+    "comma-dangle": [
+      "error",
+      "never"
+    ]
   }
 }
