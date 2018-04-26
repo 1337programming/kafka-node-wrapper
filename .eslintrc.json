@@ -1,0 +1,9 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "extends": "google",
+  "rules": {
+    "no-trailing-spaces": "0"
+  }
+}
