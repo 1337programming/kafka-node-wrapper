@@ -1,7 +1,6 @@
 const KafkaWrapper = require('./src/index');
 
 /* ARBITRARY EXTERNAL CODE BEGIN */
-
 /**
  * This callback type is called `requestCallback` and is displayed as a global symbol.
  * @callback requestCallback
@@ -45,7 +44,6 @@ async function doStuff(data) {
     }, 500);
   });
 }
-
 /* ARBITRARY EXTERNAL CODE END */
 
 class SampleOverride {
