@@ -1,7 +1,7 @@
-const Kafka = require('./src/index');
+const {Consumer, Producer} = require('./src/index');
 
-const consumer = new Kafka.consumer();
-const producer = new Kafka.producer();
+const consumer = new Consumer();
+const producer = new Producer();
 
 /**
  * @param {Consumer} con
@@ -29,34 +29,17 @@ function consumerEvent(con) {
 
 /**
  * @param pro
- * @return {Promise<any>}
+ * @return {Promise<DeliveryReport>}
  */
-function producerEvent(pro) {
-  return new Promise((resolve, reject) => {
-    pro.report()
-      .subscribe((report) => {
-        console.log('SAMPLE Producer Delivery Report:', report);
-        return resolve(report);
-      });
-    pro.error()
-      .subscribe((err) => {
-        console.log('SAMPLE Producer Error:', err);
-        return reject(err);
-      });
-    console.log('SAMPLE Producer Connected');
-    const message = {
-      foo: 1,
-      bar: 2
-    };
-    pro.publish(JSON.stringify(message));
-  });
+function producerEvent(pro, message) {
+  return pro.publish(JSON.stringify(message));
 }
 
 function main() {
 
   Promise.all([consumer.connect(), producer.connect()])
     .then(() => {
-      return Promise.all([consumerEvent(consumer), producerEvent(producer)]);
+      return Promise.all([consumerEvent(consumer), producerEvent(producer, {foo: 1, bar: 2})]);
     })
     .then((data) => {
       console.log('DATA', data);

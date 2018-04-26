@@ -1,24 +1,24 @@
 const {KafkaConsumer} = require('node-rdkafka'); // Kafka Node SDK
 const {Subject} = require('rxjs'); // Reactive Extension (helps us structure events)
 const KafkaClient = require('./client');
-const DEFAULT_CONFIG = require('./default-config').consumer;
+const {DEFAULT_CONSUMER_CONFIG} = require('./default-config');
 
 /**
  * Kafka Consumer
- * @param {ConsumerConfig} [conf=DEFAULT_CONFIG] - defaults to default config
+ * @param {ConsumerConfig} [conf=DEFAULT_CONSUMER_CONFIG] - defaults to default config
  * @param {TopicConfig} [topicConfig=null] - the Kafka Topic Configuration
  */
 class Consumer extends KafkaClient {
 
   /**
    * Kafka Consumer
-   * @param {ConsumerConfig} [conf=DEFAULT_CONFIG] - defaults to default config
+   * @param {ConsumerConfig} [conf=DEFAULT_CONSUMER_CONFIG] - defaults to default config
    * @param {TopicConfig} [topicConfig=null] - the Kafka Topic Configuration
    */
-  constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
+  constructor(conf = DEFAULT_CONSUMER_CONFIG, topicConfig = null) {
     super();
 
-    this._config = Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
+    this._config = Object.assign(DEFAULT_CONSUMER_CONFIG, conf); // Ensures defaults
 
     this._consumeLoop = null;
     this._messageDispatcher = new Subject();

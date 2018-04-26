@@ -1,4 +1,5 @@
-const Subject = require('rxjs').Subject;
+const {Subject} = require('rxjs');
+const {KAFKA_EVENTS} = require('./default-config');
 
 /**
  * Kafka Client base class
@@ -85,6 +86,9 @@ class KafkaClient {
         });
       })
       .then(() => {
+        KAFKA_EVENTS.forEach((event) => {
+          kafkaClient.removeAllListeners(event);
+        });
         this._connected = false;
       });
   }

@@ -2,23 +2,23 @@ const KafkaProducer = require('node-rdkafka').Producer; // Kafka Node SDK
 const {Subject} = require('rxjs'); // Reactive Extension (helps us structure events)
 require('rxjs/add/operator/toPromise');
 const KafkaClient = require('./client');
-const DEFAULT_CONFIG = require('./default-config').producer;
+const {DEFAULT_PRODUCER_CONFIG} = require('./default-config');
 
 /**
  * Kafka Producer
- * @param {ProducerConfig} [conf=DEFAULT_CONFIG] - defaults to default config
+ * @param {ProducerConfig} [conf=DEFAULT_PRODUCER_CONFIG] - defaults to default config
  * @param {Config} [topicConfig=null] - the Kafka Topic Configuration
  */
 class Producer extends KafkaClient {
 
   /**
-   * @param {ProducerConfig} [conf=DEFAULT_CONFIG] - defaults to default config
+   * @param {ProducerConfig} [conf=DEFAULT_PRODUCER_CONFIG] - defaults to default config
    * @param {Config} [topicConfig=null] - the Kafka Topic Configuration
    */
-  constructor(conf = DEFAULT_CONFIG, topicConfig = null) {
+  constructor(conf = DEFAULT_PRODUCER_CONFIG, topicConfig = null) {
     super();
 
-    this._config = Object.assign(DEFAULT_CONFIG, conf); // Ensures defaults
+    this._config = Object.assign(DEFAULT_PRODUCER_CONFIG, conf); // Ensures defaults
 
     this._pollLoop = null;
     this._deliveryReportDispatcher = new Subject();

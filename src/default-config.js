@@ -4,7 +4,7 @@ const ENV = require('dotenv').config().parsed; // Environment from docker .ENV
  * KafkaConfig
  */
 module.exports = {
-  consumer: {
+  DEFAULT_CONSUMER_CONFIG: {
     client: {
       // debug: 'all',
       'group.id': 'kafka',
@@ -16,7 +16,7 @@ module.exports = {
     autoInterval: true,
     consumeMax: 1
   },
-  producer: {
+  DEFAULT_PRODUCER_CONFIG: {
     client: {
       // debug: 'all',
       'metadata.broker.list': `${ENV.KafkaIP}:${ENV.KafkaPort}`,
@@ -25,5 +25,16 @@ module.exports = {
     topics: [ENV.Topic1Name],
     throttle: ENV.Throttle,
     autoInterval: true
-  }
+  },
+  KAFKA_EVENTS: [
+    'disconnected',
+    'ready',
+    'event',
+    'event.log',
+    'event.stats',
+    'event.error',
+    'event.throttle',
+    'delivery-report',
+    'data'
+  ]
 };
