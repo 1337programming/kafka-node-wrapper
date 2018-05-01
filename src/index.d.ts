@@ -197,7 +197,7 @@ export class Consumer extends Client {
 
   public kafkaConsumer: Kafka.KafkaConsumer;
 
-  constructor(conf: ConsumerConfig, topicConfig?: TopicConfig);
+  constructor(conf?: ConsumerConfig, topicConfig?: TopicConfig);
 
   public message(): Observable<MessagePayload>;
 
@@ -217,7 +217,7 @@ export class Producer extends Client {
 
   public kafkaProducer: Kafka.Producer;
 
-  constructor(conf: ProducerConfig, topicConfig: TopicConfig);
+  constructor(conf?: ProducerConfig, topicConfig?: TopicConfig);
 
   public publish(message: string, topic?: string, partition?: number, key?: string, opaque?: string): Promise<DeliveryReport>;
 
