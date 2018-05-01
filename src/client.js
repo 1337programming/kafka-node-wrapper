@@ -13,6 +13,7 @@ class KafkaClient {
     this._connected = false;
     this._logDispatcher = new Subject();
     this._errorDispatcher = new Subject();
+    this._disconnectDispatcher = new Subject();
   }
 
   /**
@@ -73,29 +74,25 @@ class KafkaClient {
     return new Promise(
       (resolve, reject) => {
 
-        kafkaClient.prependListener('event.error', (err) => {
+        kafkaClient.on('event.error', (err) => {
           console.error('Disconnect Operation (Error)', `${new Date()}: Error:`, err);
           this._errorDispatcher.next(err);
           return reject(err);
         });
 
-        kafkaClient.on('disconnected', (arg) => {
-          console.log('Disconnect Operation', `${new Date()}: Client Disconnected: ${JSON.stringify(arg)}`);
+        kafkaClient.disconnect((arg) => {
+          console.log('Disconnect', arg);
+        });
+
+        this._disconnectDispatcher.subscribe(() => {
           return resolve();
         });
 
-        kafkaClient.disconnect();
-
-        setTimeout(() => {
-          const err = new Error(`Disconnect Operation (Error) ${new Date()}: Failed to Disconnect`);
-          console.log(err.message);
-          return reject(err);
-        }, 20000); // Wait 20 seconds
       })
       .then(() => {
-        KAFKA_EVENTS.forEach((event) => {
-          kafkaClient.removeAllListeners(event);
-        });
+        // KAFKA_EVENTS.forEach((event) => {
+        //   kafkaClient.removeAllListeners(event);
+        // });
         this._connected = false;
       });
   }
@@ -122,8 +119,10 @@ class KafkaClient {
     });
 
     kafkaClient.on('disconnected', (arg) => {
+      console.log('Disconnect Operation', `${new Date()}: Client Disconnected: ${JSON.stringify(arg)}`);
+      this._disconnectDispatcher.next();
+    });
 
-    })
   }
 
   /**
