@@ -1,5 +1,35 @@
+<a name="top"></a>
+
 # API
 
+* [Configuration](#Configuration)
+* [Consumer](#Consumer)
+* [Producer](#Producer)
+
+
+<a name="Configuration"></a>
+
+## Configuration
+
+### All
+
+Configurations custom to this wrapper
+
+|   Field    | Description|   Type     | Default   |
+|------------|------------|------------|-----------|
+| throttle   | Throttle interval time (ms) | Number | 500|
+| topics     | Topics to subscribe to  | String[]  | \['kafka-test-topic'\] |
+| autoInterval | Allow auto intervals for polling (producer) and consuming (consumer). | boolean  | true |
+
+### Consumer
+
+Configurations custom to this wrapper's Consumer class.
+
+|   Field    | Description|   Type     | Default   |
+|------------|------------|------------|-----------|
+| consumeMax   | Number of messages to consume for each interval. | Number | 1 |
+
+[back to top](#top)
 
 <a name="Consumer"></a>
 

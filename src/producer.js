@@ -62,6 +62,7 @@ class Producer extends KafkaClient {
    * @param {String} [key=null] - keyed message (optional)
    * @param {String} [opaque=null] - opaque token which gets passed along to your delivery reports
    * @return {Promise<DeliveryReport>}
+   * @TODO will delivery report be synchronized with produce?
    */
   publish(message, topic = this._config.topics[0], partition = -1, key = null, opaque = null) {
     return new Promise((resolve, reject) => {

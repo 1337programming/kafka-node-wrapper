@@ -166,6 +166,12 @@ export interface MessagePayload {
 }
 
 export interface DeliveryReport {
+  topic: string;
+  partition: number;
+  offset: number;
+  key: string;
+  opaque: string;
+  size: number;
 
 }
 

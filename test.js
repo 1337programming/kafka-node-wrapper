@@ -10,7 +10,11 @@ describe('Kafka  Test', () => {
     });
 
     afterEach(() => {
-      return Promise.all([producer.disconnect(), consumer.disconnect()]);
+      console.log('Disconnect');
+      return Promise.all([producer.disconnect(), consumer.disconnect()])
+        .then((data) => {
+          console.log('Disconnected', data);
+        });
     });
 
     it('Pub Sub', () => {

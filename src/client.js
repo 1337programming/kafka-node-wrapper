@@ -72,7 +72,6 @@ class KafkaClient {
     }
     return new Promise(
       (resolve, reject) => {
-        kafkaClient.disconnect();
 
         kafkaClient.prependListener('event.error', (err) => {
           console.error('Disconnect Operation (Error)', `${new Date()}: Error:`, err);
@@ -84,6 +83,14 @@ class KafkaClient {
           console.log('Disconnect Operation', `${new Date()}: Client Disconnected: ${JSON.stringify(arg)}`);
           return resolve();
         });
+
+        kafkaClient.disconnect();
+
+        setTimeout(() => {
+          const err = new Error(`Disconnect Operation (Error) ${new Date()}: Failed to Disconnect`);
+          console.log(err.message);
+          return reject(err);
+        }, 20000); // Wait 20 seconds
       })
       .then(() => {
         KAFKA_EVENTS.forEach((event) => {
@@ -113,6 +120,10 @@ class KafkaClient {
       console.error(`Error Log: ${new Date()}:`, err);
       this._errorDispatcher.next(err);
     });
+
+    kafkaClient.on('disconnected', (arg) => {
+
+    })
   }
 
   /**
