@@ -36,7 +36,7 @@ export interface KafkaConfig {
   'bootstrap.servers'?: string;
   'message.max.bytes'?: number;
   'message.copy.max.bytes'?: number;
-  'receive.message.max.bytes': number;
+  'receive.message.max.bytes'?: number;
   'max.in.flight.requests.per.connection'?: number;
   'max.in.flight'?: number;
   'metadata.request.timeout.ms'?: number;
@@ -45,7 +45,7 @@ export interface KafkaConfig {
   'topic.metadata.refresh.fast.interval.ms'?: number;
   'topic.metadata.refresh.fast.cnt'?: number;
   'topic.metadata.refresh.sparse'?: number;
-  'topic.blacklist': string[];
+  'topic.blacklist'?: string[];
   'debug'?: string;
   'socket.timeout.ms'?: number;
   'socket.blocking.max.ms'?: number;
