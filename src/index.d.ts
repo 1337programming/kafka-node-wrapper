@@ -100,6 +100,7 @@ export interface KafkaConfig {
   'heartbeat.interval.ms'?: number;
   'group.protocol.type'?: string;
   'coordinator.query.interval.ms'?: number;
+  'queue.buffering.max.messages'?: number;
 }
 
 export interface KafkaConsumerConfig extends KafkaConfig {
@@ -122,7 +123,6 @@ export interface KafkaConsumerConfig extends KafkaConfig {
 }
 
 export interface KafkaProducerConfig extends KafkaConfig {
-  'queue.buffering.max.messages'?: number;
   'queue.buffering.max.kbytes'?: number;
   'queue.buffering.max.ms'?: number;
   'linger.ms'?: number;
