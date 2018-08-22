@@ -1,6 +1,6 @@
-///<reference path="../node_modules/@types/node/index.d.ts"/>
 import { Observable } from 'rxjs/Observable';
 import * as Kafka from 'node-rdkafka';
+import { Buffer } from 'node';
 
 export interface Log {
   fac: string;
