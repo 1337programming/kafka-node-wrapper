@@ -14,16 +14,16 @@ export interface Config {
   topics?: string[];
   throttle?: number;
   autoInterval?: boolean;
-  client: KafkaConfig
+  client?: KafkaConfig
 }
 
 export interface ConsumerConfig extends Config {
   consumeMax?: number;
-  client: KafkaConsumerConfig;
+  client?: KafkaConsumerConfig;
 }
 
 export interface ProducerConfig extends Config {
-  client: KafkaProducerConfig;
+  client?: KafkaProducerConfig;
 }
 
 /**
