@@ -20,8 +20,8 @@ Install
 const Kafka = require('kafka-node-wrapper'); // Node < 9.x
 // import * as Kafka from 'kafka-node-wrapper' // Node > 9.x
 
-const consumer = new Kafka.consumer();
-const producer = new Kafka.producer();
+const consumer = new Kafka.Consumer();
+const producer = new Kafka.Producer();
 
 // Connect with producer and consumer in parallel
 function connect() {
