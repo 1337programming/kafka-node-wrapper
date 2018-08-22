@@ -65,29 +65,14 @@ class Producer extends KafkaClient {
    * @TODO will delivery report be synchronized with produce?
    */
   publish(message, topic = this._config.topics[0], partition = -1, key = null, opaque = null) {
-    // eslint-disable-next-line new-cap
-    return this.publishBuffer(new Buffer.from(message), topic, partition, key, opaque);
-  }
-
-  /**
-   * Publish a message
-   * @param {Buffer} messageBuffer - message buffer to send
-   * @param {String} [topic=this._config.topics[0]] - topic to send to
-   * @param {number} [partition=-1] - optionally  specify a partition for the message, this defaults to -1 - which will
-   *  use librdkafka's default partitioner (consistent random for keyed messages, random for unkeyed messages)
-   * @param {String} [key=null] - keyed message (optional)
-   * @param {String} [opaque=null] - opaque token which gets passed along to your delivery reports
-   * @return {Promise<DeliveryReport>}
-   * @TODO will delivery report be synchronized with produce?
-   */
-  publishBuffer(messageBuffer, topic = this._config.topics[0], partition = -1, key = null, opaque = null) {
     return new Promise((resolve, reject) => {
 
       try {
         this.kafkaProducer.produce(
           topic,
           partition,
-          message,
+          // eslint-disable-next-line new-cap
+          new Buffer.from(message),
           key,
           Date.now(),
           opaque
@@ -111,6 +96,48 @@ class Producer extends KafkaClient {
   }
 
   /**
+   * Publish a message
+   * @param {String} message - message to send
+   * @param {String} [topic=this._config.topics[0]] - topic to send to
+   * @param {number} [partition=-1] - optionally  specify a partition for the message, this defaults to -1 - which will
+   *  use librdkafka's default partitioner (consistent random for keyed messages, random for unkeyed messages)
+   * @param {String} [key=null] - keyed message (optional)
+   * @param {String} [opaque=null] - opaque token which gets passed along to your delivery reports
+   * @return {Promise<DeliveryReport>}
+   * @TODO will delivery report be synchronized with produce?
+   */
+  publish(message, topic = this._config.topics[0], partition = -1, key = null, opaque = null) {
+    return new Promise((resolve, reject) => {
+
+      try {
+        this.kafkaProducer.produce(
+          topic,
+          partition,
+          this._createBuffer(message),
+          key,
+          Date.now(),
+          opaque
+        );
+
+        this.kafkaProducer.prependListener('delivery-report', (err, report) => {
+          if (err) {
+            // @TODO don't error here?
+            super.emitError(err);
+          }
+          console.log('Delivery Report Operation:', new Date(), report);
+          this._deliveryReportDispatcher.next(report);
+          resolve(report);
+        });
+
+      } catch (err) {
+        console.error('Producer Operation (Error)', new Date(), err);
+        super.emitError(err);
+        return reject(err);
+      }
+    });
+  }
+
+  /**
    * Polls the producer for delivery reports or other events to be transmitted via the emitter.
    */
   poll() {
@@ -125,6 +152,39 @@ class Producer extends KafkaClient {
     return this._deliveryReportDispatcher.asObservable();
   }
 
+  /**
+   * checks to see if obj is a buffer
+   * @param {object} obj to check
+   * @return {boolean|*}
+   * @private
+   */
+  _isBuffer(obj) {
+    return obj != null && obj.constructor != null &&
+      typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj);
+  }
+
+  /**
+   * create buffer from message
+   * @param {object} message
+   * @return {*}
+   * @private {Buffer}
+   */
+  _createBuffer(message) {
+    if (this._isBuffer(message)) {
+      // eslint-disable-next-line new-cap
+      return message;
+    } else if (typeof message === 'string') {
+      // eslint-disable-next-line new-cap
+      return new Buffer.from(message);
+    } else {
+      try {
+        // eslint-disable-next-line new-cap
+        return new Buffer.from(JSON.stringify(message));
+      } catch (err) {
+        throw new Error('Invalid message input ' + err);
+      }
+    }
+  }
 
   /**
    * Initializes the events

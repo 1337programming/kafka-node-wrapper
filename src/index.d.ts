@@ -225,8 +225,7 @@ export class Producer extends Client {
 
   constructor(conf?: ProducerConfig, topicConfig?: TopicConfig);
 
-  public publish(message: string, topic?: string, partition?: number, key?: string, opaque?: string): Promise<DeliveryReport>;
-  public publishBuffer(messageBuffer: Buffer, topic?: string, partition?: number, key?: string, opaque?: string): Promise<DeliveryReport>;
+  public publish(message: string | Buffer | number | object | boolean, topic?: string, partition?: number, key?: string, opaque?: string): Promise<DeliveryReport>;
 
   public report(): Observable<DeliveryReport>;
 
