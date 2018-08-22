@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs/Observable';
 import * as Kafka from 'node-rdkafka';
-import { Buffer } from '@types/node';
 
 export interface Log {
   fac: string;
