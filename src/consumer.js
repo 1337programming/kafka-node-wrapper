@@ -56,7 +56,7 @@ class Consumer extends KafkaClient {
    * Message stream to listen to
    * @return {Observable<T>} - message stream
    */
-  message() {
+  onMessage() {
     return this._messageDispatcher.asObservable();
   }
 

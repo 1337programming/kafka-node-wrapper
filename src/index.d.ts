@@ -184,9 +184,11 @@ export abstract class Client {
 
   constructor();
 
-  public log(): Observable<Log>;
+  public onLog(): Observable<Log>;
 
-  public error(): Observable<Error>;
+  public onError(): Observable<Error>;
+
+  public onDisconnected(): Observable<void>;
 
   protected connectClient(kafkaClient?: KafkaClient): Promise<{ name: string }>;
 
@@ -205,7 +207,7 @@ export class Consumer extends Client {
 
   constructor(conf?: ConsumerConfig, topicConfig?: TopicConfig);
 
-  public message(): Observable<MessagePayload>;
+  public onMessage(): Observable<MessagePayload>;
 
   public connect(): Promise<{ name: string }>;
 
@@ -227,7 +229,7 @@ export class Producer extends Client {
 
   public publish(message: string | Buffer | number | object | boolean, topic?: string, partition?: number, key?: string, opaque?: string): Promise<DeliveryReport>;
 
-  public report(): Observable<DeliveryReport>;
+  public onReport(): Observable<DeliveryReport>;
 
   public connect(): Promise<{ name: string }>;
 

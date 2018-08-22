@@ -148,7 +148,7 @@ class Producer extends KafkaClient {
    * Stream delivery report from the kafka producer
    * @return {Observable<DeliveryReport>}
    */
-  report() {
+  onReport() {
     return this._deliveryReportDispatcher.asObservable();
   }
 

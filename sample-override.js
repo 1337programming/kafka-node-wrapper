@@ -75,14 +75,14 @@ class SampleOverride {
       this._startConsuming(1);
 
       // Listen to Messages
-      this.consumer.message().subscribe(async (message) => {
+      this.consumer.onMessage().subscribe(async (message) => {
         this._stopConsuming(); // Got a message stop consuming (this will not cancel other consumed messages)
         await this._process(message); // Process Message
         this._startConsuming(1); // Consume the next message
       });
 
       // Logging
-      this.consumer.error().subscribe((err) => {
+      this.consumer.onError().subscribe((err) => {
         console.error(err);
       });
 

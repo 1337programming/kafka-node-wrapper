@@ -9,18 +9,18 @@ const producer = new Producer();
  */
 function consumerEvent(con) {
   return new Promise((resolve, reject) => {
-    con.message()
+    con.onMessage()
       .subscribe((data) => {
         resolve(data);
         console.log('SAMPLE Consumer Data:', data);
       });
-    con.error()
+    con.onError()
       .subscribe((err) => {
         reject(err);
         console.log('SAMPLE Consumer Error:', err);
       });
     console.log('SAMPLE Consumer Connected');
-    con.log()
+    con.onLog()
       .subscribe((log) => {
         console.log('SAMPLE log', log);
       });

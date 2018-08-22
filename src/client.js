@@ -20,7 +20,7 @@ class KafkaClient {
    * Listen to log stream
    * @return {Observable<log>} - log message
    */
-  log() {
+  onLog() {
     return this._logDispatcher.asObservable();
   }
 
@@ -28,8 +28,16 @@ class KafkaClient {
    * Listen to error stream
    * @return {Observable<Error>}
    */
-  error() {
+  onError() {
     return this._errorDispatcher.asObservable();
+  }
+
+  /**
+   * Listen to disconnect event
+   * @return {Observable<void>}
+   */
+  onDisconnected() {
+    return this._disconnectDispatcher.asObservable();
   }
 
   /**

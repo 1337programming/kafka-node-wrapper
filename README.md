@@ -30,21 +30,21 @@ function connect() {
 
 function events() {
   // Consumer Events
-  consumer.message()
+  consumer.onMessage()
     .subscribe((data) => {
       console.log('Data', data);
     });
-  consumer.error()
+  consumer.onError()
     .subscribe((err) => {
       console.log('Consumer Error', err);
     });
 
   // Producer Events
-  producer.report()
+  producer.onReport()
     .subscribe((report) => {
       console.log('Producer Delivery Report', report);
     });
-  producer.error()
+  producer.onError()
     .subscribe((err) => {
       console.log('Producer Error', err);
     });
