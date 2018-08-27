@@ -116,7 +116,7 @@ class Consumer extends KafkaClient {
     this._consumeLoop = setInterval(() => {
       // start consuming messages
       this.kafkaConsumer.consume(this._config.consumeMax);
-    }, this._config.e);
+    }, this._config.throttle);
   }
 
 }

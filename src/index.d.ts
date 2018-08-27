@@ -207,7 +207,7 @@ export class Consumer extends Client {
 
   constructor(conf?: ConsumerConfig, topicConfig?: TopicConfig);
 
-  public onMessage(): Observable<MessagePayload>;
+  public onMessage<Type>(): Observable<MessagePayload<Type>>;
 
   public connect(): Promise<{ name: string }>;
 
