@@ -97,7 +97,8 @@ class Consumer extends KafkaClient {
       // @TODO remove this after test
       console.log(JSON.stringify(message));
       console.log(message.value.toString());
-      this._messageDispatcher.next(message.value.toString());
+      message.value = message.value.toString();
+      this._messageDispatcher.next(message);
 
     });
   }
