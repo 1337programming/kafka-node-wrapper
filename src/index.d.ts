@@ -155,8 +155,8 @@ export interface TopicConfig {
   'consume.callback.max.messages'?: number;
 }
 
-export interface MessagePayload {
-  value: Buffer; // message contents as a Buffer
+export interface MessagePayload<Type> {
+  value: Type; // message contents
   size: number; // size of the message, in bytes
   topic: string; // topic the message comes from
   offset: number; // offset the message was read from

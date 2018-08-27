@@ -97,7 +97,12 @@ class Consumer extends KafkaClient {
       // @TODO remove this after test
       console.log(JSON.stringify(message));
       console.log(message.value.toString());
-      message.value = message.value.toString();
+      try {
+        message.value = JSON.parse(message.value.toString());
+      } catch (err) {
+        // Ignore error
+        console.error('Failed to parse message', err);
+      }
       this._messageDispatcher.next(message);
 
     });
