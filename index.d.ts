@@ -26,6 +26,12 @@ export interface ProducerConfig extends Config {
   client?: KafkaProducerConfig;
 }
 
+export interface StreamConfig {
+  objectMode: boolean;
+  topics: string | string[];
+  waitInterval: number;
+}
+
 /**
  * Configuration from rdkafka
  */
